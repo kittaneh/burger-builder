@@ -5,6 +5,7 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import axios from '../../axios-orders';
 
 
 const INGREDIENT_PRICES = {
@@ -96,7 +97,24 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinuelHandler = () => {
-       alert('You continued');
+        //alert('You continued');
+        const order = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,
+            customer: {
+                name: 'Yahya',
+                address: {
+                    street: 'Teststreet 2',
+                    zipCode: '123456',
+                    country: 'Palestine'
+                },
+                email: 'test@test.com'
+            },
+            deliveryMethod: 'fastest'
+        }
+        axios.post('/orders.json', order)
+            .then(response => console.log(response))
+            .catch(error => console.log(error));
     }
 
     render() {
@@ -113,11 +131,11 @@ class BurgerBuilder extends Component {
         return (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
-                    <OrderSummary 
-                    ingredients={this.state.ingredients}
-                    price={this.state.totalPrice}
-                    purchaseCancelled={this.purchaseCancelHandler}
-                    purchaseContinued={this.purchaseContinuelHandler}
+                    <OrderSummary
+                        ingredients={this.state.ingredients}
+                        price={this.state.totalPrice}
+                        purchaseCancelled={this.purchaseCancelHandler}
+                        purchaseContinued={this.purchaseContinuelHandler}
                     />
                 </Modal>
                 <Burger ingredients={this.state.ingredients} />
