@@ -9,7 +9,7 @@ import Input from '../../../components/UI/Input/Input';
 class ContactData extends Component {
 
     state = {
-        oerderForm: {
+        orderForm: {
             name: {
                 elementType: 'input',
                 elementConfig: { type: 'text', placeholder: 'Your Name' },
@@ -42,8 +42,8 @@ class ContactData extends Component {
                         { value: 'fastest', displayValue: 'Fastest' },
                         { value: 'cheapest', displayValue: 'Cheapest' }
                     ],
-                    value: ''
-                }
+                },
+                value: ''
             },
         },
         loading: false
@@ -52,9 +52,14 @@ class ContactData extends Component {
     orderHandler = (event) => {
         event.preventDefault();
         this.setState({ loading: true });
+        const formData = {};
+        for (let id in this.state.orderForm){
+            formData[id]= this.state.orderForm[id].value; 
+        }
         const order = {
             ingredients: this.props.ingredients,
             price: this.props.price,
+            orderData:formData
         }
         axios.post('/orders.json', order)
             .then(response => {
@@ -64,32 +69,43 @@ class ContactData extends Component {
             .catch(error => this.setState({ loading: false }));
     }
 
-    inputChangedHandler = (event) => {
-      console.log(event.target.value);
+    inputChangedHandler = (event, id) => {
+
+        const updatedOrderForm = {
+            ...this.state.orderForm //doesnt deep clone
+        };
+
+        const updatedFormElement = {
+            ...updatedOrderForm[id]
+        };
+
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[id] = updatedFormElement;
+        this.setState({orderForm:updatedOrderForm});
     }
 
     render() {
 
         const formElementArray = [];
-        for (let key in this.state.oerderForm) {
+        for (let key in this.state.orderForm) {
             formElementArray.push({
                 id: key,
-                config: this.state.oerderForm[key]
+                config: this.state.orderForm[key]
             });
         }
 
 
-        let form = (<form >
+        let form = (<form  onSubmit={this.orderHandler}>
             {formElementArray.map(formElemnt => (
                 <Input
                     key={formElemnt.id}
                     elementType={formElemnt.config.elementType}
                     elementConfig={formElemnt.config.elementConfig}
                     value={formElemnt.config.value}
-                    changed={this.inputChangedHandler}
+                    changed={(event) => this.inputChangedHandler(event, formElemnt.id)}
                 />
             ))}
-            <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+            <Button btnType="Success" >ORDER</Button>
         </form>);
         if (this.state.loading) {
             form = <Spinner />
