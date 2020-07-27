@@ -33,7 +33,7 @@ class BurgerBuilder extends Component {
             .then(response => {
                 this.setState({ ingredients: response.data })
             })
-            .catch(error => {this.setState({error:true})});
+            .catch(error => { this.setState({ error: true }) });
     }
 
     updatePurchaseState = (ingredients) => {
@@ -123,7 +123,16 @@ class BurgerBuilder extends Component {
         // axios.post('/orders.json', order)
         //     .then(response => this.setState({ loading: false, purchasing: false }))
         //     .catch(error => this.setState({ loading: false, purchasing: false }));
-        this.props.history.push('/checkout');
+
+        const queryParams = [];
+        for (let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        const queryString = queryParams.join('&');
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString
+        });
     }
 
     render() {
@@ -137,7 +146,7 @@ class BurgerBuilder extends Component {
         }
 
         let orderSummary = null;
-        let burger = this.state.error  ?  <p>Error loading ingredients</p> :<Spinner />;
+        let burger = this.state.error ? <p>Error loading ingredients</p> : <Spinner />;
 
         if (this.state.ingredients) {
             burger = (
