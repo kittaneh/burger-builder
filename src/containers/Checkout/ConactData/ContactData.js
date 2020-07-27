@@ -4,15 +4,47 @@ import axios from '../../../axios-orders';
 import Button from '../../../components/UI/Button/Button';
 import classes from './ContactData.css';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import Input from '../../../components/UI/Input/Input';
 
 class ContactData extends Component {
 
     state = {
-        name: '',
-        email: '',
-        address: {
-            street: '',
-            postalCode: ''
+        oerderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: { type: 'text', placeholder: 'Your Name' },
+                value: ''
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: { type: 'text', placeholder: 'Street' },
+                value: ''
+            },
+            zipCode: {
+                elementType: 'input',
+                elementConfig: { type: 'text', placeholder: 'ZIP code' },
+                value: ''
+            },
+            country: {
+                elementType: 'input',
+                elementConfig: { type: 'text', placeholder: 'Country' },
+                value: ''
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: { type: 'email', placeholder: 'Your Email' },
+                value: ''
+            },
+            deliveryMethod: {
+                elementType: 'select',
+                elementConfig: {
+                    options: [
+                        { value: 'fastest', displayValue: 'Fastest' },
+                        { value: 'cheapest', displayValue: 'Cheapest' }
+                    ],
+                    value: ''
+                }
+            },
         },
         loading: false
     }
@@ -20,20 +52,9 @@ class ContactData extends Component {
     orderHandler = (event) => {
         event.preventDefault();
         this.setState({ loading: true });
-        //alert('You continued');
         const order = {
             ingredients: this.props.ingredients,
             price: this.props.price,
-            customer: {
-                name: 'Yahya',
-                address: {
-                    street: 'Teststreet 2',
-                    zipCode: '123456',
-                    country: 'Palestine'
-                },
-                email: 'test@test.com'
-            },
-            deliveryMethod: 'fastest'
         }
         axios.post('/orders.json', order)
             .then(response => {
@@ -41,16 +62,33 @@ class ContactData extends Component {
                 this.props.history.push('/');
             })
             .catch(error => this.setState({ loading: false }));
+    }
 
+    inputChangedHandler = (event) => {
+      console.log(event.target.value);
     }
 
     render() {
 
+        const formElementArray = [];
+        for (let key in this.state.oerderForm) {
+            formElementArray.push({
+                id: key,
+                config: this.state.oerderForm[key]
+            });
+        }
+
+
         let form = (<form >
-            <input className={classes.Input} type="text" name="name" placeholder="Your Name"></input>
-            <input className={classes.Input} type="text" name="email" placeholder="Your Email"></input>
-            <input className={classes.Input} type="text" name="street" placeholder="Street"></input>
-            <input className={classes.Input} type="text" name="postal" placeholder="Postal Code"></input>
+            {formElementArray.map(formElemnt => (
+                <Input
+                    key={formElemnt.id}
+                    elementType={formElemnt.config.elementType}
+                    elementConfig={formElemnt.config.elementConfig}
+                    value={formElemnt.config.value}
+                    changed={this.inputChangedHandler}
+                />
+            ))}
             <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
         </form>);
         if (this.state.loading) {
@@ -59,7 +97,7 @@ class ContactData extends Component {
 
         return (
             <div className={classes.ContactData}>
-                <hr4>Enter your Contact Data</hr4>
+                <h4>Enter your Contact Data</h4>
                 {form}
             </div>
         );
