@@ -6,17 +6,22 @@ const input = props => {
 
 
     let inputEelement = null;
+    const inputClasses = [classes.InputElement];
+
+    if (props.invalid && props.shouldValidate && props.touched){
+        inputClasses.push(classes.Invalid);
+    }
 
     switch (props.elementType) {
         case ('input'):
-            inputEelement = <input className={classes.InputElement} {...props.elementConfig} value={props.value} onChange={props.changed} />;
+            inputEelement = <input className={inputClasses.join(' ')} {...props.elementConfig} value={props.value} onChange={props.changed} />;
             break;
         case ('textarea'):
-            inputEelement = <textarea className={classes.InputElement} {...props.elementConfig} value={props.value} onChange={props.changed}/>;
+            inputEelement = <textarea className={inputClasses.join(' ')} {...props.elementConfig} value={props.value} onChange={props.changed}/>;
             break;
         case ('select'):
             inputEelement = (<select
-                className={classes.InputElement}
+                className={inputClasses.join(' ')}
                 value={props.value}
                 onChange={props.changed}
                 >
@@ -26,7 +31,7 @@ const input = props => {
             </select>);
             break;
         default:
-            inputEelement = <input className={classes.InputElement} {...props.elementConfig} value={props.value} onChange={props.changed}/>
+            inputEelement = <input className={inputClasses.join(' ')} {...props.elementConfig} value={props.value} onChange={props.changed}/>
     }
     return (
         <div className={classes.Input}>
